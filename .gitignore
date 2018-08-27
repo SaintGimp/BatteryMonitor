@@ -1,3 +1,5 @@
 *.b#*
 *.s#*
 *.pro
+
+.DS_Store
