@@ -187,7 +187,7 @@ ENDDEF
 DEF SaintGimp_Particle_Xenon A 0 20 Y Y 1 F N
 F0 "A" -400 1150 50 H V L CNN
 F1 "SaintGimp_Particle_Xenon" 100 -1250 50 H V L CNN
-F2 "Module:Adafruit_Feather" 100 -1350 50 H I L CNN
+F2 "SaintGimp:Adafruit_Feather" 100 -1350 50 H I L CNN
 F3 "" 0 -800 50 H I C CNN
 $FPLIST
  Adafruit*Feather*
