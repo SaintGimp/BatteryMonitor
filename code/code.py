@@ -13,10 +13,11 @@ line_glyphs = 63
 
 # These voltage ranges assume that we have minimal voltage
 # drop between the battery terminals and the monitor
-battery_voltage_green = 12.2
-battery_voltage_yellow = 11.9
-battery_voltage_red = 11.7
-battery_voltage_cutoff = 11.5
+battery_voltage_yellow = 12.2
+battery_voltage_red = 11.9
+battery_voltage_cutoff = 11.7
+
+moving_average_window = 8
 
 i2c = board.I2C()
 
@@ -65,10 +66,13 @@ red_led.value = False
 #line1.text = "Saint Gimp\nBattery monitor"
 #time.sleep(1.055)
 
-voltage_low_point = 1000
+voltage_average = 13
 amp_hours = 0.0
 energy = 0.0
 then = time.monotonic()
+
+power_enable.value = True
+lockout = False
 
 while True:
     time.sleep(1.055)
@@ -86,28 +90,25 @@ while True:
     
     line1.text = "{:.2f}".format(voltage) + " V  " + "{:.3f}".format(current) + " A\n" + "{:.2f}".format(power) + " W\n" + "{:.3f}".format(amp_hours) + " Ah  " + "{:.2f}".format(energy) + " Wh"
 
-    if voltage < voltage_low_point:
-        voltage_low_point = voltage
+    voltage_average = voltage_average - ((voltage_average - voltage) / moving_average_window)
 
-    if voltage_low_point > battery_voltage_green:
+    if lockout:
+        power_enable.value = False
+        green_led.value = False
+        yellow_led.value = False
+        red_led.value = False
+    elif voltage_average > battery_voltage_yellow:
         green_led.value = True
         yellow_led.value = False
         red_led.value = False
-    elif voltage_low_point > battery_voltage_yellow:
+    elif voltage_average > battery_voltage_red:
         green_led.value = False
         yellow_led.value = True
         red_led.value = False
-    elif voltage_low_point > battery_voltage_red:
+    elif voltage_average > battery_voltage_cutoff:
         green_led.value = False
         yellow_led.value = False
         red_led.value = True
     else:
-        green_led.value = False
-        yellow_led.value = False
-        red_led.value = False
-
-    if voltage_low_point > battery_voltage_cutoff:
-        power_enable.value = True
-    else:
-        power_enable.value = False
+        lockout = True
 
